@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+	<Properties>
+		<Property name="logDir">C:\\Projects\\Order-api\\logs\\app</Property>
+	</Properties>
+	<Appenders>
+		<RollingFile name="AuditFile" fileName="${logDir}/audit.log" filePattern="${logDir}/audit-%d{yyyy-MM-dd}.log">
+			<DefaultRolloverStrategy compressionLevel="0" />
+			<MarkerFilter marker="AUDIT" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout>
+				<Pattern>%date{yyyy-MM-dd'T'HH:mm:ssXXX}|%map{grid}|%MDC{ra}|%MDC{uid}|%MDC{cid}|%MDC{luid}|%map{goid}|%level{ERROR=01,INFO=00,WARN=04}|02|%MDC{tid}|%MDC{pd}|%MDC{pt}|%map{text}|%MDC{sessionId}|%MDC{queryString}|%map{duration}%n</Pattern>
+			</PatternLayout>
+			<TimeBasedTriggeringPolicy />
+		</RollingFile>
+
+		<Async name="AsyncAuditFile">
+			<AppenderRef ref="AuditFile" />
+		</Async>
+
+		<RollingFile name="OrderFile" fileName="${logDir}/order.log" filePattern="${logDir}/order-%d{yyyy-MM-dd}.log">
+			<DefaultRolloverStrategy compressionLevel="0" />
+			<MarkerFilter marker="AUDIT" onMatch="DENY" onMismatch="ACCEPT" />
+			<PatternLayout>
+				<Pattern>%date{ISO8601} %-5level [%t] %MDC{ra,cid,tid,uid,sessionId} %class{1.} | %message%n</Pattern>
+			</PatternLayout>
+			<TimeBasedTriggeringPolicy />
+		</RollingFile>
+
+		<Async name="AsynOrderFile">
+			<AppenderRef ref="OrderFile" />
+		</Async>
+
+	
+	</Appenders>
+
+	<Loggers>
+		<Logger name="br.com.rodslab.orderapi.logging.AuditLogger" level="INFO" additivity="false">
+			<AppenderRef ref="AsyncAuditFile" />
+		</Logger>
+
+		<Logger name="br.com.rodslab" level="INFO" additivity="false">
+			<AppenderRef ref="AsynOrderFile" />
+		</Logger>
+
+
+		<Root level="INFO">
+			<AppenderRef ref="AsynOrderFile" />
+		</Root>
+	</Loggers>
+
+</Configuration>
